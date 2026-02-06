@@ -1,0 +1,8 @@
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/AuthServiceApplication.java
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/config/SecurityConfig.java
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/controller/AuthController.java
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/dto/AuthResponse.java
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/dto/LoginRequest.java
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/dto/RegisterRequest.java
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/entity/User.java
+/Users/karanvirsingh/Desktop/Loanzy/backend/auth-service/src/main/java/com/loanzy/auth_service/repository/UserRepository.java
