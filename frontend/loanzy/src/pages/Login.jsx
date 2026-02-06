@@ -1,14 +1,40 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ArrowRight, Lock, User } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Mock login - navigate to dashboard
-    navigate("/dashboard");
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: email, password: password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Login Successful:", data);
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.userId);
+        navigate("/dashboard");
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error("Login Error:", err);
+      setError(`Error: ${err.message}. Check console for details.`);
+    }
   };
 
   return (
@@ -24,12 +50,13 @@ const Login = () => {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-2">Welcome Back</h2>
             <p className="text-neutral-400">Sign in to manage your finances</p>
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-neutral-300">
-                Email Address
+                Email / Username
               </label>
               <div className="relative">
                 <User
@@ -37,9 +64,11 @@ const Login = () => {
                   size={18}
                 />
                 <input
-                  type="email"
+                  type="text"
                   placeholder="john@example.com"
                   className="glass-input w-full pl-10 pr-4 py-3 rounded-xl"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
@@ -65,6 +94,8 @@ const Login = () => {
                   type="password"
                   placeholder="••••••••"
                   className="glass-input w-full pl-10 pr-4 py-3 rounded-xl"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
@@ -83,9 +114,9 @@ const Login = () => {
 
           <div className="mt-8 text-center text-sm text-neutral-500">
             Don't have an account?{" "}
-            <a href="#" className="text-white hover:underline">
-              Apply for a Loan
-            </a>
+            <Link to="/register" className="text-white hover:underline">
+              Create Account
+            </Link>
           </div>
         </div>
       </div>

@@ -11,22 +11,34 @@ import LoanCard from "../components/Loancard";
 import LoanTable from "../components/Loantable";
 
 const Dashboard = () => {
-  const activeLoansData = [
-    {
-      id: "#LN-2023-001",
-      type: "Home Loan",
-      amount: "₹75,00,000",
-      status: "Active",
-      nextEmi: "Oct 24, 2023",
-    },
-    {
-      id: "#LN-2023-042",
-      type: "Personal Loan",
-      amount: "₹10,00,000",
-      status: "Pending",
-      nextEmi: "-",
-    },
-  ];
+  const [activeLoansData, setActiveLoansData] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchLoans = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      try {
+        const response = await fetch(`http://localhost:8080/loans/user/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          // Map backend data to frontend table format
+          const formattedData = data.map(loan => ({
+            id: `#LN-${loan.id}`,
+            type: loan.type,
+            amount: `₹${loan.amount.toLocaleString()}`,
+            status: loan.status,
+            nextEmi: loan.nextEmiDate || "-",
+          }));
+          setActiveLoansData(formattedData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch loans", err);
+      }
+    };
+
+    fetchLoans();
+  }, []);
 
   return (
     <div className="bg-black min-h-screen pt-20 pb-10 px-4 md:px-8">
