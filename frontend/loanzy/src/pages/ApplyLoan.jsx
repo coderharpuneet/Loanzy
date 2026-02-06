@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { ArrowLeft, Calculator, CheckCircle, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const ApplyLoan = () => {
+  const navigate = useNavigate();
   const [loanAmount, setLoanAmount] = useState(500000);
   const [tenure, setTenure] = useState(24);
+  const [loanType, setLoanType] = useState("Personal");
   const interestRate = 12; // 12% annual
 
   const calculateEMI = () => {
@@ -14,6 +16,41 @@ const ApplyLoan = () => {
       r *
       (Math.pow(1 + r, tenure) / (Math.pow(1 + r, tenure) - 1));
     return Math.round(emi);
+    return Math.round(emi);
+  };
+
+  const handleApplyLoan = async (e) => {
+    e.preventDefault();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Please login to apply");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/loans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userId,
+          type: loanType + " Loan",
+          amount: loanAmount,
+          status: "Active",
+          nextEmiDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          emiAmount: calculateEMI()
+        })
+      });
+
+      if (response.ok) {
+        navigate("/dashboard");
+      } else {
+        alert("Application failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error submitting application");
+    }
   };
 
   return (
@@ -85,13 +122,17 @@ const ApplyLoan = () => {
                         <label className="text-sm font-medium text-neutral-300">
                           Purpose
                         </label>
-                        <select className="glass-input w-full px-4 py-3 rounded-xl appearance-none">
-                          <option className="bg-neutral-900">Personal</option>
-                          <option className="bg-neutral-900">
+                        <select
+                          className="glass-input w-full px-4 py-3 rounded-xl appearance-none"
+                          value={loanType}
+                          onChange={(e) => setLoanType(e.target.value)}
+                        >
+                          <option className="bg-neutral-900" value="Personal">Personal</option>
+                          <option className="bg-neutral-900" value="Home Renovation">
                             Home Renovation
                           </option>
-                          <option className="bg-neutral-900">Education</option>
-                          <option className="bg-neutral-900">Business</option>
+                          <option className="bg-neutral-900" value="Education">Education</option>
+                          <option className="bg-neutral-900" value="Business">Business</option>
                         </select>
                       </div>
                     </div>
@@ -145,7 +186,7 @@ const ApplyLoan = () => {
                 </div>
 
                 <div className="pt-4 flex justify-end">
-                  <button className="btn-primary flex items-center gap-2">
+                  <button type="button" onClick={handleApplyLoan} className="btn-primary flex items-center gap-2">
                     Submit Application
                     <ChevronRight size={18} />
                   </button>
