@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Lock, User, Mail } from "lucide-react";
-
+import toast from "react-hot-toast";
 const Register = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -14,7 +14,7 @@ const Register = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8080/auth/register", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,14 +25,16 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("Registration Successful:", data);
+        toast.success("Registration Successful! Please login.");
         navigate("/login");
       } else {
         setError(data.message || "Registration failed");
+        toast.error(data.message || "Registration failed");
       }
     } catch (err) {
       console.error("Registration Error:", err);
       setError(`Error: ${err.message}. Check console for details.`);
+      toast.error("Network error occurred.");
     }
   };
 
